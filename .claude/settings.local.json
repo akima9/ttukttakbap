@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(grep -E \"\\\\.\\(md|txt|yml|yaml\\)$\")",
-      "mcp__obsidian__view"
-    ]
-  }
-}

@@ -108,3 +108,21 @@ menu ──< recipe
 | step_order | INT | 순서 |
 | description | TEXT | 조리 설명 |
 | tip | TEXT | 팁 (선택) |
+
+### API 설계
+
+Base URL: `/api/v1` | 응답 형식: JSON | 인증: 없음 (v1 기준)
+
+| 메서드 | 경로 | 설명 |
+|--------|------|------|
+| GET | `/api/v1/menus` | 전체 메뉴 목록 조회 |
+| GET | `/api/v1/menus/{menuId}` | 메뉴 단건 상세 조회 |
+| GET | `/api/v1/menus/{menuId}/ingredients?people={people}` | 인원 수 기반 재료 목록 (`people` 기본값: 2) |
+| GET | `/api/v1/menus/{menuId}/recipe` | 단계별 레시피 조회 |
+
+**공통 에러 응답 형식**
+```json
+{ "status": 404, "message": "해당 메뉴를 찾을 수 없습니다.", "timestamp": "2026-05-02T12:00:00" }
+```
+
+에러 코드: `400` 잘못된 요청 / `404` 리소스 없음 / `500` 서버 오류
