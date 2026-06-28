@@ -10,6 +10,10 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/v1/admin")
 class AdminRecipeController(private val recipeService: RecipeService) {
 
+    @GetMapping("/menus/{menuId}/recipes")
+    fun list(@PathVariable menuId: Long): ResponseEntity<List<RecipeResponse>> =
+        ResponseEntity.ok(recipeService.getRecipes(menuId))
+
     @PostMapping("/menus/{menuId}/recipes")
     fun create(@PathVariable menuId: Long, @RequestBody request: RecipeRequest): ResponseEntity<RecipeResponse> =
         ResponseEntity.status(HttpStatus.CREATED).body(recipeService.createRecipe(menuId, request))

@@ -34,6 +34,27 @@ class MenuIngredientServiceTest {
     private val request = MenuIngredientRequest(ingredientId = 2, amountPerPerson = BigDecimal("150.0"), unit = "g")
 
     @Test
+    fun `메뉴별 재료 연결 목록을 id와 함께 조회한다`() {
+        whenever(menuRepository.existsById(1L)).thenReturn(true)
+        whenever(menuIngredientRepository.findByMenuId(1L))
+            .thenReturn(listOf(MenuIngredient(id = 9, menu = menu, ingredient = ingredient, amountPerPerson = BigDecimal("150.0"), unit = "g")))
+
+        val result = menuIngredientService.getLinks(1L)
+
+        assertThat(result).hasSize(1)
+        assertThat(result[0].id).isEqualTo(9L)
+        assertThat(result[0].ingredientName).isEqualTo("김치")
+    }
+
+    @Test
+    fun `없는 메뉴의 연결 목록 조회 시 NotFoundException`() {
+        whenever(menuRepository.existsById(99L)).thenReturn(false)
+
+        assertThatThrownBy { menuIngredientService.getLinks(99L) }
+            .isInstanceOf(NotFoundException::class.java)
+    }
+
+    @Test
     fun `메뉴에 재료를 연결한다`() {
         whenever(menuRepository.findById(1L)).thenReturn(Optional.of(menu))
         whenever(ingredientRepository.findById(2L)).thenReturn(Optional.of(ingredient))

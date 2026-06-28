@@ -11,6 +11,11 @@ class RecipeService(
     private val recipeRepository: RecipeRepository,
     private val menuRepository: MenuRepository,
 ) {
+    fun getRecipes(menuId: Long): List<RecipeResponse> {
+        if (!menuRepository.existsById(menuId)) throw NotFoundException("해당 메뉴를 찾을 수 없습니다.")
+        return recipeRepository.findByMenuIdOrderByStepOrder(menuId).map { RecipeResponse.from(it) }
+    }
+
     fun createRecipe(menuId: Long, request: RecipeRequest): RecipeResponse {
         val menu = menuRepository.findById(menuId)
             .orElseThrow { NotFoundException("해당 메뉴를 찾을 수 없습니다.") }

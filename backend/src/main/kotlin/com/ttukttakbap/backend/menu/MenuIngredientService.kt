@@ -12,6 +12,11 @@ class MenuIngredientService(
     private val menuRepository: MenuRepository,
     private val ingredientRepository: IngredientRepository,
 ) {
+    fun getLinks(menuId: Long): List<MenuIngredientLinkResponse> {
+        if (!menuRepository.existsById(menuId)) throw NotFoundException("해당 메뉴를 찾을 수 없습니다.")
+        return menuIngredientRepository.findByMenuId(menuId).map { MenuIngredientLinkResponse.from(it) }
+    }
+
     fun linkIngredient(menuId: Long, request: MenuIngredientRequest): MenuIngredientLinkResponse {
         val menu = menuRepository.findById(menuId)
             .orElseThrow { NotFoundException("해당 메뉴를 찾을 수 없습니다.") }
