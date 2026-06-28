@@ -1,31 +1,77 @@
 package com.ttukttakbap.backend.menu
 
+import com.ttukttakbap.backend.common.dto.PageResponse
 import com.ttukttakbap.backend.menu.dto.MenuIngredientResponse
 import com.ttukttakbap.backend.menu.dto.MenuResponse
 import com.ttukttakbap.backend.recipe.dto.RecipeStepResponse
+import org.springframework.data.domain.PageRequest
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api/v1/menus")
+@RequestMapping("/api/v1")
 class MenuController(private val menuService: MenuService) {
 
-    @GetMapping
-    fun getMenus(): ResponseEntity<List<MenuResponse>> =
-        ResponseEntity.ok(menuService.getMenus())
+    @GetMapping("/menus")
+    fun getMenus(
+        @RequestParam(required = false) category: String?,
+        @RequestParam(required = false) difficulty: String?,
+        @RequestParam(required = false) maxCookTime: Int?,
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "20") size: Int,
+    ): ResponseEntity<PageResponse<MenuResponse>> =
+        ResponseEntity.ok(
+            menuService.getMenus(parseCategory(category), parseDifficulty(difficulty), maxCookTime, PageRequest.of(page, size)),
+        )
 
-    @GetMapping("/{menuId}")
+    @GetMapping("/menus/recommend")
+    fun recommend(
+        @RequestParam(defaultValue = "2") people: Int,
+        @RequestParam(required = false) category: String?,
+        @RequestParam(required = false) difficulty: String?,
+        @RequestParam(required = false) maxCookTime: Int?,
+        @RequestParam(defaultValue = "false") useMyFridge: Boolean,
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "20") size: Int,
+    ): ResponseEntity<PageResponse<MenuResponse>> {
+        validatePeople(people)
+        return ResponseEntity.ok(
+            menuService.recommend(parseCategory(category), parseDifficulty(difficulty), maxCookTime, PageRequest.of(page, size)),
+        )
+    }
+
+    @GetMapping("/menus/{menuId}")
     fun getMenu(@PathVariable menuId: Long): ResponseEntity<MenuResponse> =
         ResponseEntity.ok(menuService.getMenu(menuId))
 
-    @GetMapping("/{menuId}/ingredients")
+    @GetMapping("/menus/{menuId}/ingredients")
     fun getMenuIngredients(
         @PathVariable menuId: Long,
         @RequestParam(defaultValue = "2") people: Int,
-    ): ResponseEntity<List<MenuIngredientResponse>> =
-        ResponseEntity.ok(menuService.getMenuIngredients(menuId, people))
+    ): ResponseEntity<List<MenuIngredientResponse>> {
+        validatePeople(people)
+        return ResponseEntity.ok(menuService.getMenuIngredients(menuId, people))
+    }
 
-    @GetMapping("/{menuId}/recipe")
+    @GetMapping("/menus/{menuId}/recipe")
     fun getMenuRecipe(@PathVariable menuId: Long): ResponseEntity<List<RecipeStepResponse>> =
         ResponseEntity.ok(menuService.getMenuRecipe(menuId))
+
+    @GetMapping("/categories")
+    fun getCategories(): ResponseEntity<List<String>> =
+        ResponseEntity.ok(menuService.getCategories())
+
+    private fun parseCategory(label: String?): Category? = label?.let { Category.fromLabel(it) }
+
+    private fun parseDifficulty(value: String?): Difficulty? = value?.let {
+        try {
+            Difficulty.valueOf(it.uppercase())
+        } catch (e: IllegalArgumentException) {
+            throw IllegalArgumentException("유효하지 않은 난이도입니다: $it")
+        }
+    }
+
+    private fun validatePeople(people: Int) {
+        if (people !in 1..8) throw IllegalArgumentException("인원수는 1~8 사이여야 합니다.")
+    }
 }

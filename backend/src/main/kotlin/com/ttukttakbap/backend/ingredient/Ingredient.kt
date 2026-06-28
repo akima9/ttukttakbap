@@ -9,4 +9,5 @@ class Ingredient(
     val name: String,
     val purchaseUnit: String,
     val purchaseLocation: String? = null,
+    val coupangUrl: String? = null,
 )

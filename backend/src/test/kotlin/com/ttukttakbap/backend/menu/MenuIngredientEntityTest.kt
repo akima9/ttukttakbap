@@ -15,7 +15,7 @@ class MenuIngredientEntityTest {
 
     @Test
     fun `메뉴와 재료를 연결하고 인분당 양을 저장할 수 있다`() {
-        val menu = entityManager.persist(Menu(name = "김치찌개", description = "설명", imageUrl = "", cookTimeMinutes = 30, difficulty = Difficulty.EASY))
+        val menu = entityManager.persist(Menu(name = "김치찌개", description = "설명", imageUrl = "", cookTimeMinutes = 30, difficulty = Difficulty.EASY, category = Category.JJIGAE))
         val ingredient = entityManager.persist(Ingredient(name = "김치", purchaseUnit = "1포기"))
         val menuIngredient = MenuIngredient(menu = menu, ingredient = ingredient, amountPerPerson = BigDecimal("150.00"), unit = "g")
         val saved = entityManager.persistAndFlush(menuIngredient)

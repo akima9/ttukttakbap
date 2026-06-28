@@ -15,4 +15,6 @@ class Menu(
     val cookTimeMinutes: Int,
     @Enumerated(EnumType.STRING)
     val difficulty: Difficulty,
+    @Enumerated(EnumType.STRING)
+    val category: Category,
 )
