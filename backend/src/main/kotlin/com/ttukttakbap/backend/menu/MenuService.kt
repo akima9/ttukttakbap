@@ -3,6 +3,7 @@ package com.ttukttakbap.backend.menu
 import com.ttukttakbap.backend.common.dto.PageResponse
 import com.ttukttakbap.backend.common.exception.NotFoundException
 import com.ttukttakbap.backend.menu.dto.MenuIngredientResponse
+import com.ttukttakbap.backend.menu.dto.MenuRequest
 import com.ttukttakbap.backend.menu.dto.MenuResponse
 import com.ttukttakbap.backend.recipe.RecipeRepository
 import com.ttukttakbap.backend.recipe.dto.RecipeStepResponse
@@ -63,4 +64,37 @@ class MenuService(
     }
 
     fun getCategories(): List<String> = Category.entries.map { it.label }
+
+    fun createMenu(request: MenuRequest): MenuResponse {
+        val saved = menuRepository.save(request.toMenu())
+        return MenuResponse.from(saved)
+    }
+
+    fun updateMenu(menuId: Long, request: MenuRequest): MenuResponse {
+        if (!menuRepository.existsById(menuId)) throw NotFoundException("해당 메뉴를 찾을 수 없습니다.")
+        val saved = menuRepository.save(request.toMenu(menuId))
+        return MenuResponse.from(saved)
+    }
+
+    fun deleteMenu(menuId: Long) {
+        if (!menuRepository.existsById(menuId)) throw NotFoundException("해당 메뉴를 찾을 수 없습니다.")
+        menuRepository.deleteById(menuId)
+    }
+
+    private fun MenuRequest.toMenu(id: Long = 0): Menu = Menu(
+        id = id,
+        name = name,
+        description = description,
+        imageUrl = imageUrl,
+        cookTimeMinutes = cookTimeMinutes,
+        difficulty = parseDifficulty(difficulty),
+        category = Category.fromLabel(category),
+    )
+
+    private fun parseDifficulty(value: String): Difficulty =
+        try {
+            Difficulty.valueOf(value.uppercase())
+        } catch (e: IllegalArgumentException) {
+            throw IllegalArgumentException("유효하지 않은 난이도입니다: $value")
+        }
 }

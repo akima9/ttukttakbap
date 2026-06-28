@@ -2,6 +2,7 @@ package com.ttukttakbap.backend.menu
 
 import com.ttukttakbap.backend.common.exception.NotFoundException
 import com.ttukttakbap.backend.ingredient.Ingredient
+import com.ttukttakbap.backend.menu.dto.MenuRequest
 import com.ttukttakbap.backend.recipe.Recipe
 import com.ttukttakbap.backend.recipe.RecipeRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -13,6 +14,8 @@ import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
@@ -108,6 +111,70 @@ class MenuServiceTest {
 
         // 0.5 * 3 = 1.5 → 올림 → 2
         assertThat(result[0].requiredAmount).isEqualByComparingTo(BigDecimal("2"))
+    }
+
+    private val sampleRequest = MenuRequest(
+        name = "김치찌개", description = "얼큰한 찌개", imageUrl = "",
+        cookTimeMinutes = 30, difficulty = "EASY", category = "찌개",
+    )
+
+    @Test
+    fun `메뉴를 생성한다`() {
+        whenever(menuRepository.save(any<Menu>())).thenReturn(sampleMenu)
+
+        val result = menuService.createMenu(sampleRequest)
+
+        assertThat(result.name).isEqualTo("김치찌개")
+        assertThat(result.category).isEqualTo("찌개")
+    }
+
+    @Test
+    fun `유효하지 않은 카테고리로 생성하면 IllegalArgumentException을 던진다`() {
+        assertThatThrownBy { menuService.createMenu(sampleRequest.copy(category = "없는카테고리")) }
+            .isInstanceOf(IllegalArgumentException::class.java)
+    }
+
+    @Test
+    fun `유효하지 않은 난이도로 생성하면 IllegalArgumentException을 던진다`() {
+        assertThatThrownBy { menuService.createMenu(sampleRequest.copy(difficulty = "VERY_HARD")) }
+            .isInstanceOf(IllegalArgumentException::class.java)
+    }
+
+    @Test
+    fun `존재하는 메뉴를 수정한다`() {
+        whenever(menuRepository.existsById(1L)).thenReturn(true)
+        whenever(menuRepository.save(any<Menu>())).thenReturn(sampleMenu)
+
+        val result = menuService.updateMenu(1L, sampleRequest)
+
+        assertThat(result.name).isEqualTo("김치찌개")
+    }
+
+    @Test
+    fun `존재하지 않는 메뉴 수정 시 NotFoundException을 던진다`() {
+        whenever(menuRepository.existsById(99L)).thenReturn(false)
+
+        assertThatThrownBy { menuService.updateMenu(99L, sampleRequest) }
+            .isInstanceOf(NotFoundException::class.java)
+        verify(menuRepository, never()).save(any<Menu>())
+    }
+
+    @Test
+    fun `메뉴를 삭제한다`() {
+        whenever(menuRepository.existsById(1L)).thenReturn(true)
+
+        menuService.deleteMenu(1L)
+
+        verify(menuRepository).deleteById(1L)
+    }
+
+    @Test
+    fun `존재하지 않는 메뉴 삭제 시 NotFoundException을 던진다`() {
+        whenever(menuRepository.existsById(99L)).thenReturn(false)
+
+        assertThatThrownBy { menuService.deleteMenu(99L) }
+            .isInstanceOf(NotFoundException::class.java)
+        verify(menuRepository, never()).deleteById(any())
     }
 
     @Test

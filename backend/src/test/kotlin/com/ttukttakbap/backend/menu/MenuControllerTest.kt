@@ -2,6 +2,7 @@ package com.ttukttakbap.backend.menu
 
 import com.ttukttakbap.backend.common.dto.PageResponse
 import com.ttukttakbap.backend.common.exception.NotFoundException
+import com.ttukttakbap.backend.common.security.SecurityConfig
 import com.ttukttakbap.backend.menu.dto.MenuIngredientResponse
 import com.ttukttakbap.backend.menu.dto.MenuResponse
 import com.ttukttakbap.backend.recipe.dto.RecipeStepResponse
@@ -12,11 +13,13 @@ import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.context.annotation.Import
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import java.math.BigDecimal
 
 @WebMvcTest(MenuController::class)
+@Import(SecurityConfig::class)
 class MenuControllerTest {
 
     @Autowired lateinit var mockMvc: MockMvc
