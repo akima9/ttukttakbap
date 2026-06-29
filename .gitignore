@@ -3,3 +3,8 @@
 
 # Claude Code 로컬 설정
 .claude/settings.local.json
+
+# 환경변수 (시크릿은 .env에 두고 커밋하지 않음. 템플릿 .env.example만 추적)
+.env
+.env.local
+.env.*.local

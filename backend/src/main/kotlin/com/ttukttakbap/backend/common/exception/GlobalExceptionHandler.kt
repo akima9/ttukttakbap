@@ -19,6 +19,11 @@ class GlobalExceptionHandler {
     fun handleIllegalArgumentException(e: IllegalArgumentException): ErrorResponse =
         ErrorResponse(status = 400, message = e.message ?: "잘못된 요청입니다.")
 
+    @ExceptionHandler(UnauthorizedException::class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    fun handleUnauthorizedException(e: UnauthorizedException): ErrorResponse =
+        ErrorResponse(status = 401, message = e.message ?: "인증에 실패했습니다.")
+
     @ExceptionHandler(Exception::class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     fun handleException(e: Exception): ErrorResponse =
