@@ -2,6 +2,7 @@ package com.ttukttakbap.backend.menu
 
 import com.ttukttakbap.backend.common.dto.PageResponse
 import com.ttukttakbap.backend.common.exception.NotFoundException
+import com.ttukttakbap.backend.favorite.FavoriteRepository
 import com.ttukttakbap.backend.menu.dto.MenuIngredientResponse
 import com.ttukttakbap.backend.menu.dto.MenuRequest
 import com.ttukttakbap.backend.menu.dto.MenuResponse
@@ -17,16 +18,21 @@ class MenuService(
     private val menuRepository: MenuRepository,
     private val menuIngredientRepository: MenuIngredientRepository,
     private val recipeRepository: RecipeRepository,
+    private val favoriteRepository: FavoriteRepository,
 ) {
     fun getMenus(
         category: Category?,
         difficulty: Difficulty?,
         maxCookTime: Int?,
         pageable: Pageable,
-    ): PageResponse<MenuResponse> =
-        PageResponse.from(
-            menuRepository.search(category, difficulty, maxCookTime, pageable).map { MenuResponse.from(it) },
+        userId: Long?,
+    ): PageResponse<MenuResponse> {
+        val favoriteIds = favoriteMenuIds(userId)
+        return PageResponse.from(
+            menuRepository.search(category, difficulty, maxCookTime, pageable)
+                .map { MenuResponse.from(it, it.id in favoriteIds) },
         )
+    }
 
     // 게스트 추천: 조건 필터 후 조리시간 짧은 순(동률 시 id) 정렬. 냉장고 기반 정렬은 Phase 4에서.
     fun recommend(
@@ -34,22 +40,29 @@ class MenuService(
         difficulty: Difficulty?,
         maxCookTime: Int?,
         pageable: Pageable,
+        userId: Long?,
     ): PageResponse<MenuResponse> {
         val sorted = PageRequest.of(
             pageable.pageNumber,
             pageable.pageSize,
             Sort.by(Sort.Direction.ASC, "cookTimeMinutes").and(Sort.by(Sort.Direction.ASC, "id")),
         )
+        val favoriteIds = favoriteMenuIds(userId)
         return PageResponse.from(
-            menuRepository.search(category, difficulty, maxCookTime, sorted).map { MenuResponse.from(it) },
+            menuRepository.search(category, difficulty, maxCookTime, sorted)
+                .map { MenuResponse.from(it, it.id in favoriteIds) },
         )
     }
 
-    fun getMenu(menuId: Long): MenuResponse {
+    fun getMenu(menuId: Long, userId: Long?): MenuResponse {
         val menu = menuRepository.findById(menuId)
             .orElseThrow { NotFoundException("해당 메뉴를 찾을 수 없습니다.") }
-        return MenuResponse.from(menu)
+        return MenuResponse.from(menu, menu.id in favoriteMenuIds(userId))
     }
+
+    // 로그인 사용자면 즐겨찾기한 메뉴 id 집합, 비로그인이면 빈 집합.
+    private fun favoriteMenuIds(userId: Long?): Set<Long> =
+        if (userId == null) emptySet() else favoriteRepository.findMenuIdsByUserId(userId).toSet()
 
     fun getMenuIngredients(menuId: Long, people: Int): List<MenuIngredientResponse> {
         if (!menuRepository.existsById(menuId)) throw NotFoundException("해당 메뉴를 찾을 수 없습니다.")

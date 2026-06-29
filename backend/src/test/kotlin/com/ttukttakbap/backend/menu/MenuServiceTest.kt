@@ -1,6 +1,7 @@
 package com.ttukttakbap.backend.menu
 
 import com.ttukttakbap.backend.common.exception.NotFoundException
+import com.ttukttakbap.backend.favorite.FavoriteRepository
 import com.ttukttakbap.backend.ingredient.Ingredient
 import com.ttukttakbap.backend.menu.dto.MenuRequest
 import com.ttukttakbap.backend.recipe.Recipe
@@ -28,6 +29,7 @@ class MenuServiceTest {
     @Mock lateinit var menuRepository: MenuRepository
     @Mock lateinit var menuIngredientRepository: MenuIngredientRepository
     @Mock lateinit var recipeRepository: RecipeRepository
+    @Mock lateinit var favoriteRepository: FavoriteRepository
 
     @InjectMocks lateinit var menuService: MenuService
 
@@ -41,12 +43,24 @@ class MenuServiceTest {
         whenever(menuRepository.search(anyOrNull(), anyOrNull(), anyOrNull(), any()))
             .thenReturn(PageImpl(listOf(sampleMenu)))
 
-        val result = menuService.getMenus(null, null, null, PageRequest.of(0, 20))
+        val result = menuService.getMenus(null, null, null, PageRequest.of(0, 20), null)
 
         assertThat(result.content).hasSize(1)
         assertThat(result.content[0].name).isEqualTo("김치찌개")
         assertThat(result.content[0].category).isEqualTo("찌개")
+        assertThat(result.content[0].isFavorite).isFalse()
         assertThat(result.totalElements).isEqualTo(1)
+    }
+
+    @Test
+    fun `로그인 사용자의 즐겨찾기한 메뉴는 isFavorite가 true다`() {
+        whenever(menuRepository.search(anyOrNull(), anyOrNull(), anyOrNull(), any()))
+            .thenReturn(PageImpl(listOf(sampleMenu)))
+        whenever(favoriteRepository.findMenuIdsByUserId(1L)).thenReturn(listOf(1L))
+
+        val result = menuService.getMenus(null, null, null, PageRequest.of(0, 20), userId = 1L)
+
+        assertThat(result.content[0].isFavorite).isTrue()
     }
 
     @Test
@@ -54,7 +68,7 @@ class MenuServiceTest {
         whenever(menuRepository.search(anyOrNull(), anyOrNull(), anyOrNull(), any()))
             .thenReturn(PageImpl(listOf(sampleMenu)))
 
-        val result = menuService.recommend(null, null, null, PageRequest.of(0, 20))
+        val result = menuService.recommend(null, null, null, PageRequest.of(0, 20), null)
 
         assertThat(result.content).hasSize(1)
         assertThat(result.content[0].name).isEqualTo("김치찌개")
@@ -71,7 +85,7 @@ class MenuServiceTest {
     fun `메뉴 단건을 조회한다`() {
         whenever(menuRepository.findById(1L)).thenReturn(Optional.of(sampleMenu))
 
-        val result = menuService.getMenu(1L)
+        val result = menuService.getMenu(1L, null)
 
         assertThat(result.id).isEqualTo(1L)
         assertThat(result.name).isEqualTo("김치찌개")
@@ -81,7 +95,7 @@ class MenuServiceTest {
     fun `존재하지 않는 메뉴 조회 시 NotFoundException을 던진다`() {
         whenever(menuRepository.findById(99L)).thenReturn(Optional.empty())
 
-        assertThatThrownBy { menuService.getMenu(99L) }
+        assertThatThrownBy { menuService.getMenu(99L, null) }
             .isInstanceOf(NotFoundException::class.java)
             .hasMessage("해당 메뉴를 찾을 수 없습니다.")
     }

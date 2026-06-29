@@ -6,6 +6,7 @@ import com.ttukttakbap.backend.menu.dto.MenuResponse
 import com.ttukttakbap.backend.recipe.dto.RecipeStepResponse
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -19,9 +20,10 @@ class MenuController(private val menuService: MenuService) {
         @RequestParam(required = false) maxCookTime: Int?,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "20") size: Int,
+        @AuthenticationPrincipal userId: Long?,
     ): ResponseEntity<PageResponse<MenuResponse>> =
         ResponseEntity.ok(
-            menuService.getMenus(parseCategory(category), parseDifficulty(difficulty), maxCookTime, PageRequest.of(page, size)),
+            menuService.getMenus(parseCategory(category), parseDifficulty(difficulty), maxCookTime, PageRequest.of(page, size), userId),
         )
 
     @GetMapping("/menus/recommend")
@@ -33,16 +35,20 @@ class MenuController(private val menuService: MenuService) {
         @RequestParam(defaultValue = "false") useMyFridge: Boolean,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "20") size: Int,
+        @AuthenticationPrincipal userId: Long?,
     ): ResponseEntity<PageResponse<MenuResponse>> {
         validatePeople(people)
         return ResponseEntity.ok(
-            menuService.recommend(parseCategory(category), parseDifficulty(difficulty), maxCookTime, PageRequest.of(page, size)),
+            menuService.recommend(parseCategory(category), parseDifficulty(difficulty), maxCookTime, PageRequest.of(page, size), userId),
         )
     }
 
     @GetMapping("/menus/{menuId}")
-    fun getMenu(@PathVariable menuId: Long): ResponseEntity<MenuResponse> =
-        ResponseEntity.ok(menuService.getMenu(menuId))
+    fun getMenu(
+        @PathVariable menuId: Long,
+        @AuthenticationPrincipal userId: Long?,
+    ): ResponseEntity<MenuResponse> =
+        ResponseEntity.ok(menuService.getMenu(menuId, userId))
 
     @GetMapping("/menus/{menuId}/ingredients")
     fun getMenuIngredients(

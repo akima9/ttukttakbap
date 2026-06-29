@@ -9,6 +9,7 @@ import com.ttukttakbap.backend.recipe.dto.RecipeStepResponse
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -35,7 +36,7 @@ class MenuControllerTest {
 
     @Test
     fun `GET api_v1_menus 는 페이지 형태의 메뉴 목록을 반환한다`() {
-        whenever(menuService.getMenus(anyOrNull(), anyOrNull(), anyOrNull(), any())).thenReturn(pageOf(sampleMenu))
+        whenever(menuService.getMenus(anyOrNull(), anyOrNull(), anyOrNull(), any(), anyOrNull())).thenReturn(pageOf(sampleMenu))
 
         mockMvc.get("/api/v1/menus")
             .andExpect {
@@ -49,7 +50,7 @@ class MenuControllerTest {
 
     @Test
     fun `GET api_v1_menus_recommend 는 추천 목록을 반환한다`() {
-        whenever(menuService.recommend(anyOrNull(), anyOrNull(), anyOrNull(), any())).thenReturn(pageOf(sampleMenu))
+        whenever(menuService.recommend(anyOrNull(), anyOrNull(), anyOrNull(), any(), anyOrNull())).thenReturn(pageOf(sampleMenu))
 
         mockMvc.get("/api/v1/menus/recommend?people=2")
             .andExpect {
@@ -80,7 +81,7 @@ class MenuControllerTest {
 
     @Test
     fun `GET api_v1_menus_id 는 메뉴 단건을 반환한다`() {
-        whenever(menuService.getMenu(1L)).thenReturn(sampleMenu)
+        whenever(menuService.getMenu(eq(1L), anyOrNull())).thenReturn(sampleMenu)
 
         mockMvc.get("/api/v1/menus/1")
             .andExpect {
@@ -92,7 +93,7 @@ class MenuControllerTest {
 
     @Test
     fun `GET api_v1_menus_id 존재하지 않으면 404를 반환한다`() {
-        whenever(menuService.getMenu(99L)).thenThrow(NotFoundException("해당 메뉴를 찾을 수 없습니다."))
+        whenever(menuService.getMenu(eq(99L), anyOrNull())).thenThrow(NotFoundException("해당 메뉴를 찾을 수 없습니다."))
 
         mockMvc.get("/api/v1/menus/99")
             .andExpect {
