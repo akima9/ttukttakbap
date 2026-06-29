@@ -50,7 +50,7 @@ class MenuControllerTest {
 
     @Test
     fun `GET api_v1_menus_recommend 는 추천 목록을 반환한다`() {
-        whenever(menuService.recommend(anyOrNull(), anyOrNull(), anyOrNull(), any(), anyOrNull())).thenReturn(pageOf(sampleMenu))
+        whenever(menuService.recommend(anyOrNull(), anyOrNull(), anyOrNull(), any(), anyOrNull(), any())).thenReturn(pageOf(sampleMenu))
 
         mockMvc.get("/api/v1/menus/recommend?people=2")
             .andExpect {

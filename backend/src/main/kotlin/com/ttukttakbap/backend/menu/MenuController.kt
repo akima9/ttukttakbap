@@ -39,7 +39,7 @@ class MenuController(private val menuService: MenuService) {
     ): ResponseEntity<PageResponse<MenuResponse>> {
         validatePeople(people)
         return ResponseEntity.ok(
-            menuService.recommend(parseCategory(category), parseDifficulty(difficulty), maxCookTime, PageRequest.of(page, size), userId),
+            menuService.recommend(parseCategory(category), parseDifficulty(difficulty), maxCookTime, PageRequest.of(page, size), userId, useMyFridge),
         )
     }
 

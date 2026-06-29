@@ -3,11 +3,13 @@ package com.ttukttakbap.backend.menu
 import com.ttukttakbap.backend.common.dto.PageResponse
 import com.ttukttakbap.backend.common.exception.NotFoundException
 import com.ttukttakbap.backend.favorite.FavoriteRepository
+import com.ttukttakbap.backend.fridge.FridgeRepository
 import com.ttukttakbap.backend.menu.dto.MenuIngredientResponse
 import com.ttukttakbap.backend.menu.dto.MenuRequest
 import com.ttukttakbap.backend.menu.dto.MenuResponse
 import com.ttukttakbap.backend.recipe.RecipeRepository
 import com.ttukttakbap.backend.recipe.dto.RecipeStepResponse
+import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
@@ -19,6 +21,7 @@ class MenuService(
     private val menuIngredientRepository: MenuIngredientRepository,
     private val recipeRepository: RecipeRepository,
     private val favoriteRepository: FavoriteRepository,
+    private val fridgeRepository: FridgeRepository,
 ) {
     fun getMenus(
         category: Category?,
@@ -34,22 +37,52 @@ class MenuService(
         )
     }
 
-    // 게스트 추천: 조건 필터 후 조리시간 짧은 순(동률 시 id) 정렬. 냉장고 기반 정렬은 Phase 4에서.
+    // 추천: useMyFridge면 냉장고 보유 재료와 겹치는 수가 많은 순, 아니면 조리시간 짧은 순(동률 시 id).
     fun recommend(
         category: Category?,
         difficulty: Difficulty?,
         maxCookTime: Int?,
         pageable: Pageable,
         userId: Long?,
+        useMyFridge: Boolean,
     ): PageResponse<MenuResponse> {
-        val sorted = PageRequest.of(
-            pageable.pageNumber,
-            pageable.pageSize,
-            Sort.by(Sort.Direction.ASC, "cookTimeMinutes").and(Sort.by(Sort.Direction.ASC, "id")),
-        )
+        val fridgeIds = if (useMyFridge && userId != null) fridgeRepository.findIngredientIdsByUserId(userId) else emptyList()
         val favoriteIds = favoriteMenuIds(userId)
+        if (fridgeIds.isEmpty()) {
+            val sorted = PageRequest.of(
+                pageable.pageNumber,
+                pageable.pageSize,
+                Sort.by(Sort.Direction.ASC, "cookTimeMinutes").and(Sort.by(Sort.Direction.ASC, "id")),
+            )
+            return PageResponse.from(
+                menuRepository.search(category, difficulty, maxCookTime, sorted)
+                    .map { MenuResponse.from(it, it.id in favoriteIds) },
+            )
+        }
+        return recommendByFridge(category, difficulty, maxCookTime, pageable, fridgeIds, favoriteIds)
+    }
+
+    // 냉장고 매칭 수 desc, 동률 시 조리시간 asc, id asc. 매칭 집계는 한 번에 조회 후 메모리에서 정렬·페이징.
+    private fun recommendByFridge(
+        category: Category?,
+        difficulty: Difficulty?,
+        maxCookTime: Int?,
+        pageable: Pageable,
+        fridgeIds: List<Long>,
+        favoriteIds: Set<Long>,
+    ): PageResponse<MenuResponse> {
+        val candidates = menuRepository.search(category, difficulty, maxCookTime, Pageable.unpaged()).content
+        val matchCount = menuIngredientRepository.countMatchesByIngredientIds(fridgeIds)
+            .associate { (it[0] as Long) to (it[1] as Long) }
+        val ranked = candidates.sortedWith(
+            compareByDescending<Menu> { matchCount[it.id] ?: 0L }
+                .thenBy { it.cookTimeMinutes }
+                .thenBy { it.id },
+        )
+        val pageReq = PageRequest.of(pageable.pageNumber, pageable.pageSize)
+        val pageContent = ranked.drop(pageReq.offset.toInt()).take(pageReq.pageSize)
         return PageResponse.from(
-            menuRepository.search(category, difficulty, maxCookTime, sorted)
+            PageImpl(pageContent, pageReq, ranked.size.toLong())
                 .map { MenuResponse.from(it, it.id in favoriteIds) },
         )
     }

@@ -2,6 +2,7 @@ package com.ttukttakbap.backend.menu
 
 import com.ttukttakbap.backend.common.exception.NotFoundException
 import com.ttukttakbap.backend.favorite.FavoriteRepository
+import com.ttukttakbap.backend.fridge.FridgeRepository
 import com.ttukttakbap.backend.ingredient.Ingredient
 import com.ttukttakbap.backend.menu.dto.MenuRequest
 import com.ttukttakbap.backend.recipe.Recipe
@@ -30,6 +31,7 @@ class MenuServiceTest {
     @Mock lateinit var menuIngredientRepository: MenuIngredientRepository
     @Mock lateinit var recipeRepository: RecipeRepository
     @Mock lateinit var favoriteRepository: FavoriteRepository
+    @Mock lateinit var fridgeRepository: FridgeRepository
 
     @InjectMocks lateinit var menuService: MenuService
 
@@ -68,10 +70,29 @@ class MenuServiceTest {
         whenever(menuRepository.search(anyOrNull(), anyOrNull(), anyOrNull(), any()))
             .thenReturn(PageImpl(listOf(sampleMenu)))
 
-        val result = menuService.recommend(null, null, null, PageRequest.of(0, 20), null)
+        val result = menuService.recommend(null, null, null, PageRequest.of(0, 20), null, useMyFridge = false)
 
         assertThat(result.content).hasSize(1)
         assertThat(result.content[0].name).isEqualTo("김치찌개")
+    }
+
+    @Test
+    fun `useMyFridge 추천은 냉장고 재료와 겹치는 수가 많은 메뉴를 앞에 둔다`() {
+        val menu2 = Menu(
+            id = 2, name = "된장찌개", description = "", imageUrl = "",
+            cookTimeMinutes = 30, difficulty = Difficulty.EASY, category = Category.JJIGAE,
+        )
+        whenever(fridgeRepository.findIngredientIdsByUserId(1L)).thenReturn(listOf(10L))
+        whenever(menuRepository.search(anyOrNull(), anyOrNull(), anyOrNull(), any()))
+            .thenReturn(PageImpl(listOf(sampleMenu, menu2)))
+        // 된장찌개(id=2)가 냉장고 재료 1개와 겹침
+        whenever(menuIngredientRepository.countMatchesByIngredientIds(listOf(10L)))
+            .thenReturn(listOf(arrayOf<Any>(2L, 1L)))
+        whenever(favoriteRepository.findMenuIdsByUserId(1L)).thenReturn(emptyList())
+
+        val result = menuService.recommend(null, null, null, PageRequest.of(0, 20), userId = 1L, useMyFridge = true)
+
+        assertThat(result.content.map { it.id }).containsExactly(2L, 1L)
     }
 
     @Test
