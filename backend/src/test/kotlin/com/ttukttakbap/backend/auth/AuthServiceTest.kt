@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -72,6 +73,26 @@ class AuthServiceTest {
         service.login("kakao", "code", "uri")
 
         verify(userRepository, org.mockito.kotlin.never()).save(any<User>())
+    }
+
+    @Test
+    fun `기존 사용자는 소셜 프로필이 바뀌면 최신화한다`() {
+        val updated = User(
+            id = 1, socialProvider = SocialProvider.KAKAO, socialId = "123",
+            email = "e@e.com", nickname = "새닉네임", profileImageUrl = "img",
+        )
+        whenever(kakaoClient.fetchUserInfo("code", "uri"))
+            .thenReturn(OAuthUserInfo(SocialProvider.KAKAO, "123", "e@e.com", "새닉네임", "img"))
+        whenever(userRepository.findBySocialProviderAndSocialId(SocialProvider.KAKAO, "123")).thenReturn(user)
+        whenever(userRepository.save(any<User>())).thenReturn(updated)
+        whenever(jwtProvider.createAccessToken(1L, "USER")).thenReturn("access")
+        whenever(jwtProvider.createRefreshToken(1L)).thenReturn("refresh")
+        whenever(jwtProvider.refreshExpiryMillis()).thenReturn(1000L)
+
+        val result = service.login("kakao", "code", "uri")
+
+        assertEquals("새닉네임", result.user.nickname)
+        verify(userRepository).save(argThat { id == 1L && nickname == "새닉네임" && profileImageUrl == "img" })
     }
 
     @Test

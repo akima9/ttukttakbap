@@ -14,6 +14,9 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.provisioning.InMemoryUserDetailsManager
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.CorsConfigurationSource
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 // 어드민(/api/v1/admin/**)은 ROLE_ADMIN(HTTP Basic), 소비자 API는 공개.
 // 사용자 개인화 API(/api/v1/auth/me, /api/v1/me/**)는 JWT 액세스 토큰으로 인증한다.
@@ -25,9 +28,21 @@ class SecurityConfig(
     @Value("\${jwt.secret:local-dev-secret-key-please-override-32bytes!!}") private val jwtSecret: String,
     @Value("\${jwt.access-expiry-millis:1800000}") private val accessExpiryMillis: Long,
     @Value("\${jwt.refresh-expiry-millis:1209600000}") private val refreshExpiryMillis: Long,
+    @Value("\${cors.allowed-origins:http://localhost:3000}") private val allowedOrigins: String,
 ) {
     @Bean
     fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
+
+    // 프론트(브라우저)에서 다른 오리진의 API를 호출하므로 CORS 허용. 오리진은 env로 조정 가능.
+    @Bean
+    fun corsConfigurationSource(): CorsConfigurationSource {
+        val config = CorsConfiguration().apply {
+            allowedOrigins = this@SecurityConfig.allowedOrigins.split(",").map { it.trim() }
+            allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
+            allowedHeaders = listOf("*")
+        }
+        return UrlBasedCorsConfigurationSource().apply { registerCorsConfiguration("/**", config) }
+    }
 
     @Bean
     fun userDetailsService(passwordEncoder: PasswordEncoder): UserDetailsService =
@@ -48,6 +63,7 @@ class SecurityConfig(
     @Bean
     fun securityFilterChain(http: HttpSecurity, jwtAuthenticationFilter: JwtAuthenticationFilter): SecurityFilterChain =
         http
+            .cors {}
             .csrf { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests {

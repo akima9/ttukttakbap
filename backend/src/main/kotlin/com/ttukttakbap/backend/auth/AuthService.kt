@@ -60,9 +60,9 @@ class AuthService(
         return UserResponse.from(user)
     }
 
-    private fun findOrCreate(info: OAuthUserInfo): User =
-        userRepository.findBySocialProviderAndSocialId(info.provider, info.socialId)
-            ?: userRepository.save(
+    private fun findOrCreate(info: OAuthUserInfo): User {
+        val existing = userRepository.findBySocialProviderAndSocialId(info.provider, info.socialId)
+            ?: return userRepository.save(
                 User(
                     socialProvider = info.provider,
                     socialId = info.socialId,
@@ -71,6 +71,26 @@ class AuthService(
                     profileImageUrl = info.profileImageUrl,
                 ),
             )
+        // 소셜 프로필이 그대로면 불필요한 저장을 피하고, 바뀌었으면 최신화한다.
+        if (existing.nickname == info.nickname &&
+            existing.email == info.email &&
+            existing.profileImageUrl == info.profileImageUrl
+        ) {
+            return existing
+        }
+        return userRepository.save(
+            User(
+                id = existing.id,
+                socialProvider = existing.socialProvider,
+                socialId = existing.socialId,
+                email = info.email,
+                nickname = info.nickname,
+                profileImageUrl = info.profileImageUrl,
+                role = existing.role,
+                createdAt = existing.createdAt,
+            ),
+        )
+    }
 
     private fun issueTokens(user: User): TokenResponse {
         val accessToken = jwtProvider.createAccessToken(user.id, user.role.name)
