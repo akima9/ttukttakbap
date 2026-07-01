@@ -45,6 +45,9 @@ export default function Header() {
         <div className="ml-auto flex items-center gap-3 text-sm">
           {user ? (
             <>
+              <Link href="/my" className="text-gray-500 hover:text-orange-500 transition-colors">
+                내 메뉴
+              </Link>
               <Link href="/fridge" className="text-gray-500 hover:text-orange-500 transition-colors">
                 냉장고
               </Link>
