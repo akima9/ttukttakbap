@@ -1,6 +1,7 @@
 import ErrorMessage from '@/components/ErrorMessage'
 import IngredientsChecklist from './IngredientsChecklist'
 import RecordHistory from '@/components/RecordHistory'
+import MenuThumbnail from '@/components/MenuThumbnail'
 
 interface Ingredient {
   ingredientId: number
@@ -12,6 +13,13 @@ interface Ingredient {
   coupangUrl: string | null
 }
 
+interface MenuDetail {
+  id: number
+  name: string
+  description: string
+  imageUrl: string
+}
+
 export default async function IngredientsPage({
   searchParams,
 }: {
@@ -21,26 +29,33 @@ export default async function IngredientsPage({
 
   if (!menuId) return <ErrorMessage message="메뉴를 선택해주세요." />
 
+  let menu: MenuDetail | null = null
   let ingredients: Ingredient[] = []
   let error = ''
 
   try {
-    const res = await fetch(
-      `http://localhost:8080/api/v1/menus/${menuId}/ingredients?people=${people}`,
-      { cache: 'no-store' }
-    )
-    if (!res.ok) throw new Error('재료를 불러오지 못했습니다.')
-    ingredients = await res.json()
+    const [menuRes, ingRes] = await Promise.all([
+      fetch(`http://localhost:8080/api/v1/menus/${menuId}`, { cache: 'no-store' }),
+      fetch(`http://localhost:8080/api/v1/menus/${menuId}/ingredients?people=${people}`, {
+        cache: 'no-store',
+      }),
+    ])
+    if (!menuRes.ok || !ingRes.ok) throw new Error('메뉴 정보를 불러오지 못했습니다.')
+    menu = await menuRes.json()
+    ingredients = await ingRes.json()
   } catch (e) {
-    error = e instanceof Error ? e.message : '재료를 불러오지 못했습니다.'
+    error = e instanceof Error ? e.message : '메뉴 정보를 불러오지 못했습니다.'
   }
 
-  if (error) return <ErrorMessage message={error} />
+  if (error || !menu) return <ErrorMessage message={error || '메뉴 정보를 불러오지 못했습니다.'} />
 
   return (
     <div className="max-w-2xl mx-auto">
       <RecordHistory menuId={menuId} />
-      <h1 className="text-xl font-bold text-gray-800">필요한 재료</h1>
+      <MenuThumbnail src={menu.imageUrl} alt={menu.name} className="w-full aspect-[16/9] rounded-xl" />
+      <h1 className="mt-3 text-2xl font-bold text-gray-800">{menu.name}</h1>
+      {menu.description && <p className="mt-1 text-sm text-gray-500">{menu.description}</p>}
+      <h2 className="mt-6 text-xl font-bold text-gray-800">필요한 재료</h2>
       <p className="mt-1 mb-4 text-sm text-gray-400">{people}인분 기준</p>
       <IngredientsChecklist ingredients={ingredients} people={people} menuId={menuId} />
     </div>
