@@ -69,7 +69,7 @@ export default async function MenuPage({
       {menus.length === 0 ? (
         <p className="py-16 text-center text-sm text-gray-400">조건에 맞는 메뉴가 없어요.</p>
       ) : (
-        <div className="flex flex-col gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {menus.map(menu => (
             <MenuCard key={menu.id} menu={menu} people={people} />
           ))}
@@ -114,8 +114,8 @@ function CategoryChip({
       href={`/menu?${buildQuery({ people, category })}`}
       className={`shrink-0 text-sm px-3 py-1.5 rounded-full border transition-colors ${
         active
-          ? 'bg-orange-500 text-white border-orange-500'
-          : 'bg-white text-gray-500 border-gray-200 hover:border-orange-300'
+          ? 'bg-rose-500 text-white border-rose-500'
+          : 'bg-white text-gray-500 border-gray-200 hover:border-rose-300'
       }`}
     >
       {label}
@@ -142,7 +142,7 @@ function PageLink({
   return (
     <Link
       href={`/menu?${buildQuery({ people, category, page: String(page) })}`}
-      className="text-sm text-orange-500 px-3 py-1.5 rounded-lg hover:bg-orange-50 transition-colors"
+      className="text-sm text-rose-500 px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors"
     >
       {children}
     </Link>

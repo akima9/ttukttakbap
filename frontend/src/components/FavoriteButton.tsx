@@ -20,10 +20,10 @@ export default function FavoriteButton({ menuId }: { menuId: number }) {
     <button
       onClick={onClick}
       aria-label={favorite ? '즐겨찾기 해제' : '즐겨찾기 추가'}
-      className="absolute top-2.5 right-2.5 z-10 p-1.5 rounded-full hover:bg-orange-50 transition-colors"
+      className="absolute top-2.5 right-2.5 z-10 p-1.5 rounded-full hover:bg-rose-50 transition-colors"
     >
       <svg
-        className={`w-5 h-5 ${favorite ? 'text-orange-500' : 'text-gray-300'}`}
+        className={`w-5 h-5 ${favorite ? 'text-rose-500' : 'text-gray-300'}`}
         fill={favorite ? 'currentColor' : 'none'}
         viewBox="0 0 24 24"
         stroke="currentColor"

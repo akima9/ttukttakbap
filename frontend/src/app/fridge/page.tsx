@@ -77,7 +77,7 @@ export default function FridgePage() {
     return (
       <div className="mt-16 text-center">
         <p className="text-sm text-gray-500">냉장고를 관리하려면 로그인이 필요해요.</p>
-        <Link href="/login" className="mt-4 inline-block text-sm text-orange-500 hover:underline">
+        <Link href="/login" className="mt-4 inline-block text-sm text-rose-500 hover:underline">
           로그인하러 가기
         </Link>
       </div>
@@ -103,8 +103,8 @@ export default function FridgePage() {
               onClick={() => toggle(ing.id)}
               className={`text-sm px-3 py-1.5 rounded-full border transition-colors ${
                 has
-                  ? 'bg-orange-500 text-white border-orange-500'
-                  : 'bg-white text-gray-500 border-gray-200 hover:border-orange-300'
+                  ? 'bg-rose-500 text-white border-rose-500'
+                  : 'bg-white text-gray-500 border-gray-200 hover:border-rose-300'
               }`}
             >
               {ing.name}
@@ -115,7 +115,7 @@ export default function FridgePage() {
 
       <Link
         href="/menu?useMyFridge=1"
-        className="mt-8 block text-center text-sm text-orange-500 hover:underline"
+        className="mt-8 block text-center text-sm text-rose-500 hover:underline"
       >
         내 냉장고 재료로 메뉴 추천받기 →
       </Link>

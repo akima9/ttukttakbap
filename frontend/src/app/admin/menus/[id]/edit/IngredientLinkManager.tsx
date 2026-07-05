@@ -96,7 +96,7 @@ export default function IngredientLinkManager({ menuId }: { menuId: string }) {
       {ingredients.length === 0 ? (
         <p className="text-sm text-gray-400">
           먼저{' '}
-          <Link href="/admin/ingredients" className="text-orange-500 underline">
+          <Link href="/admin/ingredients" className="text-rose-500 underline">
             재료 관리
           </Link>
           에서 재료를 등록해주세요.
@@ -126,7 +126,7 @@ export default function IngredientLinkManager({ menuId }: { menuId: string }) {
             />
             <input className={`${inputClass} w-24`} placeholder="단위(g/개)" value={unit} onChange={(e) => setUnit(e.target.value)} required />
           </div>
-          <button className="self-end text-sm font-semibold text-white bg-orange-500 hover:bg-orange-600 rounded-lg px-4 py-2">
+          <button className="self-end text-sm font-semibold text-white bg-rose-500 hover:bg-rose-600 rounded-lg px-4 py-2">
             재료 연결
           </button>
         </form>

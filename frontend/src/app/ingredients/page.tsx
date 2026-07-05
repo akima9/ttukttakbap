@@ -38,7 +38,7 @@ export default async function IngredientsPage({
   if (error) return <ErrorMessage message={error} />
 
   return (
-    <div>
+    <div className="max-w-2xl mx-auto">
       <RecordHistory menuId={menuId} />
       <h1 className="text-xl font-bold text-gray-800">필요한 재료</h1>
       <p className="mt-1 mb-4 text-sm text-gray-400">{people}인분 기준</p>

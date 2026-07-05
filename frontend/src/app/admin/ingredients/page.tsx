@@ -120,7 +120,7 @@ export default function AdminIngredientsPage() {
               취소
             </button>
           )}
-          <button className="text-sm font-semibold text-white bg-orange-500 hover:bg-orange-600 rounded-lg px-4 py-2">
+          <button className="text-sm font-semibold text-white bg-rose-500 hover:bg-rose-600 rounded-lg px-4 py-2">
             {editingId === null ? '추가' : '저장'}
           </button>
         </div>
@@ -137,7 +137,7 @@ export default function AdminIngredientsPage() {
               </p>
             </div>
             <div className="flex gap-2 text-sm">
-              <button onClick={() => edit(i)} className="text-orange-500 hover:underline">
+              <button onClick={() => edit(i)} className="text-rose-500 hover:underline">
                 수정
               </button>
               <button onClick={() => remove(i.id, i.name)} className="text-red-400 hover:underline">

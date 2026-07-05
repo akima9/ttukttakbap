@@ -30,18 +30,18 @@ export default async function RecipePage({
   if (error) return <ErrorMessage message={error} />
 
   return (
-    <div>
+    <div className="max-w-2xl mx-auto">
       <h1 className="text-xl font-bold text-gray-800 mb-6">레시피</h1>
       <ol className="flex flex-col gap-4">
         {steps.map(step => (
           <li key={step.stepOrder} className="flex gap-3">
-            <span className="shrink-0 w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold text-sm">
+            <span className="shrink-0 w-8 h-8 rounded-full bg-rose-500 text-white flex items-center justify-center font-bold text-sm">
               {step.stepOrder}
             </span>
             <div className="flex-1 bg-white rounded-xl p-4 shadow-sm border border-gray-100">
               <p className="text-sm text-gray-800">{step.description}</p>
               {step.tip && (
-                <p className="mt-2 text-xs text-orange-500 bg-orange-50 rounded-lg px-3 py-2">
+                <p className="mt-2 text-xs text-rose-500 bg-rose-50 rounded-lg px-3 py-2">
                   {step.tip}
                 </p>
               )}
@@ -51,7 +51,7 @@ export default async function RecipePage({
       </ol>
       <Link
         href="/"
-        className="mt-8 block w-full py-3 rounded-xl text-center font-semibold text-orange-500 bg-orange-50 hover:bg-orange-100 transition-colors"
+        className="mt-8 block w-full py-3 rounded-xl text-center font-semibold text-rose-500 bg-rose-50 hover:bg-rose-100 transition-colors"
       >
         처음으로
       </Link>

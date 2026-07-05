@@ -26,7 +26,7 @@ export default function KakaoCallback({ code, error }: { code?: string; error?: 
         <ErrorMessage message={failed} />
         <button
           onClick={() => router.replace('/login')}
-          className="mt-4 text-sm text-orange-500 hover:underline"
+          className="mt-4 text-sm text-rose-500 hover:underline"
         >
           로그인으로 돌아가기
         </button>

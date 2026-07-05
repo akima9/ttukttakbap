@@ -26,7 +26,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-10 bg-white border-b border-gray-100">
-      <div className="max-w-md mx-auto px-4 h-14 flex items-center gap-3">
+      <div className="max-w-5xl mx-auto px-4 h-14 flex items-center gap-3">
         {!isHome && (
           <button
             onClick={() => router.back()}
@@ -38,17 +38,17 @@ export default function Header() {
             </svg>
           </button>
         )}
-        <Link href="/" className="text-xl font-bold text-orange-500">
+        <Link href="/" className="text-xl font-bold text-rose-500">
           뚝딱밥
         </Link>
 
         <div className="ml-auto flex items-center gap-3 text-sm">
           {user ? (
             <>
-              <Link href="/my" className="text-gray-500 hover:text-orange-500 transition-colors">
+              <Link href="/my" className="text-gray-500 hover:text-rose-500 transition-colors">
                 내 메뉴
               </Link>
-              <Link href="/fridge" className="text-gray-500 hover:text-orange-500 transition-colors">
+              <Link href="/fridge" className="text-gray-500 hover:text-rose-500 transition-colors">
                 냉장고
               </Link>
               <span className="text-gray-600">{user.nickname}</span>
@@ -57,7 +57,7 @@ export default function Header() {
               </button>
             </>
           ) : (
-            <Link href="/login" className="text-gray-500 hover:text-orange-500 transition-colors">
+            <Link href="/login" className="text-gray-500 hover:text-rose-500 transition-colors">
               로그인
             </Link>
           )}

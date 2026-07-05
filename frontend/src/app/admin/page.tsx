@@ -69,10 +69,10 @@ export default function AdminHomePage() {
       </div>
 
       <div className="flex gap-2 mb-4">
-        <Link href="/admin/menus/new" className="flex-1 text-center py-2.5 rounded-xl text-sm font-semibold text-white bg-orange-500 hover:bg-orange-600">
+        <Link href="/admin/menus/new" className="flex-1 text-center py-2.5 rounded-xl text-sm font-semibold text-white bg-rose-500 hover:bg-rose-600">
           + 새 메뉴
         </Link>
-        <Link href="/admin/ingredients" className="flex-1 text-center py-2.5 rounded-xl text-sm font-semibold text-orange-500 bg-orange-50 hover:bg-orange-100">
+        <Link href="/admin/ingredients" className="flex-1 text-center py-2.5 rounded-xl text-sm font-semibold text-rose-500 bg-rose-50 hover:bg-rose-100">
           재료 관리
         </Link>
       </div>
@@ -89,7 +89,7 @@ export default function AdminHomePage() {
               </p>
             </div>
             <div className="flex gap-2 text-sm">
-              <Link href={`/admin/menus/${menu.id}/edit`} className="text-orange-500 hover:underline">
+              <Link href={`/admin/menus/${menu.id}/edit`} className="text-rose-500 hover:underline">
                 수정
               </Link>
               <button onClick={() => remove(menu.id, menu.name)} className="text-red-400 hover:underline">

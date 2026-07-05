@@ -23,7 +23,7 @@ export default function RootLayout({
       <body className="bg-gray-50 min-h-screen">
         <FavoritesProvider>
           <Header />
-          <main className="max-w-md mx-auto px-4 py-6">
+          <main className="max-w-5xl mx-auto px-4 py-6">
             {children}
           </main>
         </FavoritesProvider>

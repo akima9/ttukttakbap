@@ -56,7 +56,7 @@ export default function MyPage() {
     return (
       <div className="mt-16 text-center">
         <p className="text-sm text-gray-500">내 메뉴는 로그인이 필요해요.</p>
-        <Link href="/login" className="mt-4 inline-block text-sm text-orange-500 hover:underline">
+        <Link href="/login" className="mt-4 inline-block text-sm text-rose-500 hover:underline">
           로그인하러 가기
         </Link>
       </div>
@@ -76,8 +76,8 @@ export default function MyPage() {
             onClick={() => setTab(t.key)}
             className={`text-sm px-3 py-1.5 rounded-full border transition-colors ${
               tab === t.key
-                ? 'bg-orange-500 text-white border-orange-500'
-                : 'bg-white text-gray-500 border-gray-200 hover:border-orange-300'
+                ? 'bg-rose-500 text-white border-rose-500'
+                : 'bg-white text-gray-500 border-gray-200 hover:border-rose-300'
             }`}
           >
             {t.label}
@@ -92,7 +92,7 @@ export default function MyPage() {
       ) : menus.length === 0 ? (
         <p className="py-16 text-center text-sm text-gray-400">{currentTab.empty}</p>
       ) : (
-        <div className="flex flex-col gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {menus.map((menu) => (
             <MenuCard key={menu.id} menu={menu} people="2" />
           ))}

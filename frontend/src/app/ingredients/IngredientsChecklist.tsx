@@ -53,7 +53,7 @@ return (
       <div className="flex gap-3 mb-3">
         <button
           onClick={copyToClipboard}
-          className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-orange-500 transition-colors"
+          className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-rose-500 transition-colors"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -62,7 +62,7 @@ return (
         </button>
         <button
           onClick={shareList}
-          className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-orange-500 transition-colors"
+          className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-rose-500 transition-colors"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
@@ -79,13 +79,13 @@ return (
               key={item.ingredientId}
               onClick={() => toggle(item.ingredientId)}
               className={`bg-white rounded-xl px-4 py-3 flex justify-between items-center shadow-sm border transition-colors cursor-pointer ${
-                isChecked ? 'border-orange-200 bg-orange-50' : 'border-gray-100'
+                isChecked ? 'border-rose-200 bg-rose-50' : 'border-gray-100'
               }`}
             >
               <div className="flex items-center gap-3">
                 <span
                   className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                    isChecked ? 'border-orange-500 bg-orange-500' : 'border-gray-300'
+                    isChecked ? 'border-rose-500 bg-rose-500' : 'border-gray-300'
                   }`}
                 >
                   {isChecked && (
@@ -104,7 +104,7 @@ return (
                 </div>
               </div>
               <div className="text-right">
-                <p className={`font-semibold ${isChecked ? 'text-gray-400' : 'text-orange-500'}`}>
+                <p className={`font-semibold ${isChecked ? 'text-gray-400' : 'text-rose-500'}`}>
                   {item.requiredAmount}{item.unit}
                 </p>
                 <p className="text-xs text-gray-400">{item.purchaseUnit}</p>
@@ -131,7 +131,7 @@ return (
 
       <Link
         href={`/recipe?people=${people}&menuId=${menuId}`}
-        className="block w-full py-3 rounded-xl text-center font-semibold text-white bg-orange-500 hover:bg-orange-600 transition-colors"
+        className="block w-full py-3 rounded-xl text-center font-semibold text-white bg-rose-500 hover:bg-rose-600 transition-colors"
       >
         레시피 보기
       </Link>

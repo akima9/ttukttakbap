@@ -70,7 +70,7 @@ export default function RecipeManager({ menuId }: { menuId: string }) {
         {recipes.map((r) => (
           <li key={r.id} className="bg-white rounded-lg p-3 border border-gray-100 flex justify-between items-start gap-2">
             <div className="text-sm">
-              <span className="font-semibold text-orange-500 mr-2">{r.stepOrder}</span>
+              <span className="font-semibold text-rose-500 mr-2">{r.stepOrder}</span>
               <span className="text-gray-800">{r.description}</span>
               {r.tip && <p className="text-xs text-gray-400 mt-1">팁: {r.tip}</p>}
             </div>
@@ -95,7 +95,7 @@ export default function RecipeManager({ menuId }: { menuId: string }) {
           <input className={inputClass} placeholder="조리 설명" value={description} onChange={(e) => setDescription(e.target.value)} required />
         </div>
         <input className={inputClass} placeholder="팁 (선택)" value={tip} onChange={(e) => setTip(e.target.value)} />
-        <button className="self-end text-sm font-semibold text-white bg-orange-500 hover:bg-orange-600 rounded-lg px-4 py-2">
+        <button className="self-end text-sm font-semibold text-white bg-rose-500 hover:bg-rose-600 rounded-lg px-4 py-2">
           단계 추가
         </button>
       </form>

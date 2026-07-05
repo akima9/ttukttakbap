@@ -21,7 +21,7 @@ export default function MenuCard({ menu, people }: { menu: Menu; people: string 
     <div className="relative">
       <Link
         href={`/ingredients?people=${people}&menuId=${menu.id}`}
-        className="block bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:border-orange-300 transition-colors"
+        className="block bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:border-rose-300 transition-colors"
       >
         <h2 className="text-base font-semibold text-gray-800 pr-8">{menu.name}</h2>
         <p className="mt-1 text-sm text-gray-500 line-clamp-2">{menu.description}</p>
@@ -36,7 +36,7 @@ export default function MenuCard({ menu, people }: { menu: Menu; people: string 
           <span className="inline-block text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">
             {menu.category}
           </span>
-          <span className="inline-block text-xs px-2 py-0.5 rounded-full bg-orange-50 text-orange-500">
+          <span className="inline-block text-xs px-2 py-0.5 rounded-full bg-rose-50 text-rose-500">
             {DIFFICULTY_LABEL[menu.difficulty]}
           </span>
         </div>
