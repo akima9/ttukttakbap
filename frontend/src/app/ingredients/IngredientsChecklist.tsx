@@ -34,25 +34,38 @@ export default function IngredientsChecklist({ ingredients, people, menuId }: Pr
     .map(item => `${item.name} ${item.requiredAmount}${item.unit}`)
     .join('\n')
 
-  const copyToClipboard = async () => {
-    await navigator.clipboard.writeText(listText)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+  const copyList = async () => {
+    try {
+      await navigator.clipboard.writeText(listText)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+      return true
+    } catch {
+      return false
+    }
   }
 
   const shareList = async () => {
     if (navigator.share) {
-      await navigator.share({ title: '뚝딱밥 재료 목록', text: listText })
-    } else {
-      alert('공유 기능은 모바일 브라우저에서 사용 가능합니다.')
+      try {
+        await navigator.share({ title: '뚝딱밥 재료 목록', text: listText })
+        return
+      } catch (e) {
+        // 사용자가 공유 시트를 취소하면 AbortError가 발생 — 정상이므로 무시한다.
+        if (e instanceof DOMException && e.name === 'AbortError') return
+        // 그 외 실패는 아래 복사로 폴백한다.
+      }
     }
+    // 공유 미지원이거나 실패 시 클립보드 복사로 대체한다.
+    const ok = await copyList()
+    if (!ok) alert('이 브라우저에서는 공유·복사를 지원하지 않습니다.')
   }
 
 return (
     <>
       <div className="flex gap-3 mb-3">
         <button
-          onClick={copyToClipboard}
+          onClick={copyList}
           className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-rose-500 transition-colors"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
