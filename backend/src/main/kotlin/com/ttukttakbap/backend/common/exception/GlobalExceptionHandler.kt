@@ -1,6 +1,7 @@
 package com.ttukttakbap.backend.common.exception
 
 import com.ttukttakbap.backend.common.dto.ErrorResponse
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -8,6 +9,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 
 @RestControllerAdvice
 class GlobalExceptionHandler {
+
+    private val log = LoggerFactory.getLogger(javaClass)
 
     @ExceptionHandler(NotFoundException::class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -26,6 +29,8 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception::class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    fun handleException(e: Exception): ErrorResponse =
-        ErrorResponse(status = 500, message = "서버 내부 오류가 발생했습니다.")
+    fun handleException(e: Exception): ErrorResponse {
+        log.error("처리되지 않은 예외로 500 응답: ${e.message}", e)
+        return ErrorResponse(status = 500, message = "서버 내부 오류가 발생했습니다.")
+    }
 }
