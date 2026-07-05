@@ -11,7 +11,7 @@ interface PageResponse {
   totalPages: number
 }
 
-const API = 'http://localhost:8080/api/v1'
+const API = process.env.API_INTERNAL_URL || 'http://localhost:8080/api/v1'
 
 function buildQuery(params: Record<string, string | undefined>) {
   const sp = new URLSearchParams()

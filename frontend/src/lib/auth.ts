@@ -2,7 +2,7 @@
 // 카카오 인가 코드를 백엔드와 교환해 받은 JWT(access/refresh) + 사용자 정보를
 // sessionStorage에 보관하고, 인증이 필요한 API 호출 시 Authorization 헤더로 전송한다.
 
-const API = 'http://localhost:8080/api/v1'
+const API = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080/api/v1'
 const ACCESS_KEY = 'accessToken'
 const REFRESH_KEY = 'refreshToken'
 const USER_KEY = 'authUser'

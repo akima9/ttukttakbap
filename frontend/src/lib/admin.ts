@@ -2,7 +2,7 @@
 // 백엔드가 HTTP Basic이라 username:password를 Base64로 만들어 sessionStorage에 보관하고,
 // admin API 호출 시 Authorization 헤더로 전송한다.
 
-const API = 'http://localhost:8080/api/v1'
+const API = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080/api/v1'
 const STORAGE_KEY = 'adminAuth'
 
 export function getAdminAuth(): string | null {

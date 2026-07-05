@@ -12,7 +12,7 @@ interface Ingredient {
   purchaseUnit: string
 }
 
-const API = 'http://localhost:8080/api/v1'
+const API = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080/api/v1'
 
 // 로그인 상태면 전체 재료 + 내 냉장고 재료를, 아니면 null을 반환한다(항상 비동기).
 async function loadFridge(): Promise<{ ingredients: Ingredient[]; fridgeIds: Set<number> } | null> {

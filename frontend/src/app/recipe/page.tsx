@@ -7,6 +7,8 @@ interface RecipeStep {
   tip: string | null
 }
 
+const API = process.env.API_INTERNAL_URL || 'http://localhost:8080/api/v1'
+
 export default async function RecipePage({
   searchParams,
 }: {
@@ -20,7 +22,7 @@ export default async function RecipePage({
   let error = ''
 
   try {
-    const res = await fetch(`http://localhost:8080/api/v1/menus/${menuId}/recipe`, { cache: 'no-store' })
+    const res = await fetch(`${API}/menus/${menuId}/recipe`, { cache: 'no-store' })
     if (!res.ok) throw new Error('레시피를 불러오지 못했습니다.')
     steps = await res.json()
   } catch (e) {

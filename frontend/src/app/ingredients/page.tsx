@@ -20,6 +20,8 @@ interface MenuDetail {
   imageUrl: string
 }
 
+const API = process.env.API_INTERNAL_URL || 'http://localhost:8080/api/v1'
+
 export default async function IngredientsPage({
   searchParams,
 }: {
@@ -35,8 +37,8 @@ export default async function IngredientsPage({
 
   try {
     const [menuRes, ingRes] = await Promise.all([
-      fetch(`http://localhost:8080/api/v1/menus/${menuId}`, { cache: 'no-store' }),
-      fetch(`http://localhost:8080/api/v1/menus/${menuId}/ingredients?people=${people}`, {
+      fetch(`${API}/menus/${menuId}`, { cache: 'no-store' }),
+      fetch(`${API}/menus/${menuId}/ingredients?people=${people}`, {
         cache: 'no-store',
       }),
     ])
