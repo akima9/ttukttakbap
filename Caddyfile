@@ -1,0 +1,11 @@
+# {$DOMAIN} = 프로덕션은 실제 도메인(예: ttukttakbap.duckdns.org) → Let's Encrypt 자동 HTTPS.
+#            로컬 스모크 테스트는 DOMAIN=:80 으로 두면 평문 HTTP로 뜬다.
+# /api/* 는 백엔드로, 나머지는 프론트로 프록시(same-origin).
+{$DOMAIN} {
+	handle /api/* {
+		reverse_proxy backend:8080
+	}
+	handle {
+		reverse_proxy frontend:3000
+	}
+}
