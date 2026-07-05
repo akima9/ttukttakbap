@@ -111,6 +111,7 @@ function CategoryChip({
 }) {
   return (
     <Link
+      replace
       href={`/menu?${buildQuery({ people, category })}`}
       className={`shrink-0 text-sm px-3 py-1.5 rounded-full border transition-colors ${
         active
@@ -141,6 +142,7 @@ function PageLink({
   }
   return (
     <Link
+      replace
       href={`/menu?${buildQuery({ people, category, page: String(page) })}`}
       className="text-sm text-rose-500 px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors"
     >
