@@ -114,7 +114,7 @@ export default function FridgePage() {
       </div>
 
       <Link
-        href="/menu?useMyFridge=1"
+        href="/?useMyFridge=1"
         className="mt-8 block w-full max-w-xs mx-auto py-3 rounded-xl text-center font-semibold text-white bg-rose-500 hover:bg-rose-600 transition-colors"
       >
         내 냉장고 재료로 메뉴 추천받기

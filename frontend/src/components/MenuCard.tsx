@@ -18,11 +18,11 @@ const DIFFICULTY_LABEL: Record<string, string> = {
   HARD: '어려움',
 }
 
-export default function MenuCard({ menu, people }: { menu: Menu; people: string }) {
+export default function MenuCard({ menu }: { menu: Menu }) {
   return (
     <div className="relative">
       <Link
-        href={`/ingredients?people=${people}&menuId=${menu.id}`}
+        href={`/people?menuId=${menu.id}`}
         className="block bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:border-rose-300 transition-colors"
       >
         <MenuThumbnail src={menu.imageUrl} alt={menu.name} className="w-full aspect-[16/9]" />
