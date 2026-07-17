@@ -8,8 +8,6 @@ interface Ingredient {
   name: string
   requiredAmount: number
   unit: string
-  purchaseUnit: string
-  purchaseLocation: string | null
   coupangUrl: string | null
 }
 
@@ -194,7 +192,7 @@ return (
                 isChecked ? 'border-rose-200 bg-rose-50' : 'border-gray-100'
               }`}
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 min-w-0">
                 <span
                   className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
                     isChecked ? 'border-rose-500 bg-rose-500' : 'border-gray-300'
@@ -206,30 +204,42 @@ return (
                     </svg>
                   )}
                 </span>
-                <div>
-                  <span className={`font-medium ${isChecked ? 'text-gray-400 line-through' : 'text-gray-800'}`}>
-                    {item.name}
-                  </span>
-                  {item.purchaseLocation && item.purchaseLocation !== '마트' && (
-                    <span className="ml-2 text-xs text-gray-400">{item.purchaseLocation}</span>
-                  )}
-                </div>
+                <span
+                  className={`font-medium break-keep ${
+                    isChecked ? 'text-gray-600 line-through' : 'text-gray-800'
+                  }`}
+                >
+                  {item.name}
+                </span>
               </div>
-              <div className="text-right">
-                <p className={`font-semibold ${isChecked ? 'text-gray-400' : 'text-rose-500'}`}>
+              <div className="flex items-center gap-3 shrink-0">
+                <p
+                  className={`font-semibold text-right min-w-[3.5rem] ${
+                    isChecked ? 'text-gray-600' : 'text-rose-600'
+                  }`}
+                >
                   {item.requiredAmount}{item.unit}
                 </p>
-                <p className="text-xs text-gray-400">{item.purchaseUnit}</p>
-                {item.coupangUrl && (
+                {item.coupangUrl ? (
+                  // before 의사요소로 히트 영역만 44px로 넓힌다 — 시각 크기(36px)는 그대로 두고 탭 타깃만 확보.
                   <a
                     href={item.coupangUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={e => e.stopPropagation()}
-                    className="mt-1 inline-block text-xs text-[#C0392B] hover:underline"
+                    aria-label={`${item.name} 구매하러 가기 (쿠팡, 새 창)`}
+                    className={`relative -my-1 w-16 h-9 shrink-0 inline-flex items-center justify-center gap-1 rounded-lg border text-xs font-medium transition-colors before:absolute before:content-[''] before:inset-x-0 before:-inset-y-1 hover:bg-gray-100 hover:border-gray-300 hover:text-gray-800 active:bg-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2 border-gray-200 text-gray-600 ${
+                      isChecked ? 'bg-transparent' : 'bg-gray-50'
+                    }`}
                   >
-                    쿠팡에서 보기
+                    구매
+                    <svg className="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
                   </a>
+                ) : (
+                  // 링크 없는 재료도 같은 폭을 예약해 필요량 우측 열이 어긋나지 않게 한다.
+                  <span className="w-16 shrink-0" aria-hidden="true" />
                 )}
               </div>
             </li>

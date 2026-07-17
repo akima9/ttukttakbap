@@ -8,3 +8,4 @@
 | 파일 | 내용 |
 |------|------|
 | [01-shopping-progress.md](01-shopping-progress.md) | 장보기 진행률 표시 UI 스펙(배치·진행 텍스트/진행바·상태·접근성·반응형) |
+| [02-ingredient-row.md](02-ingredient-row.md) | 재료 행 UI 스펙(쿠팡 보조 칩·색 충돌 해소·상태별 스펙·레이아웃·접근성) |
