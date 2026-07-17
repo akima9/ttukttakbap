@@ -1,5 +1,6 @@
 import ErrorMessage from '@/components/ErrorMessage'
 import IngredientsChecklist from './IngredientsChecklist'
+import PeopleStepper from './PeopleStepper'
 import RecordHistory from '@/components/RecordHistory'
 import MenuThumbnail from '@/components/MenuThumbnail'
 
@@ -57,8 +58,10 @@ export default async function IngredientsPage({
       <MenuThumbnail src={menu.imageUrl} alt={menu.name} className="w-full aspect-[16/9] rounded-xl" />
       <h1 className="mt-3 text-2xl font-bold text-gray-800">{menu.name}</h1>
       {menu.description && <p className="mt-1 text-sm text-gray-500">{menu.description}</p>}
-      <h2 className="mt-6 text-xl font-bold text-gray-800">필요한 재료</h2>
-      <p className="mt-1 mb-4 text-sm text-gray-400">{people}인분 기준</p>
+      <div className="mt-6 mb-4 flex items-center justify-between gap-3">
+        <h2 className="text-xl font-bold text-gray-800">필요한 재료</h2>
+        <PeopleStepper people={Number(people)} menuId={menuId} />
+      </div>
       <IngredientsChecklist ingredients={ingredients} people={people} menuId={menuId} />
     </div>
   )
