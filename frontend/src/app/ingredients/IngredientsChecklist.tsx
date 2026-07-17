@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 
 interface Ingredient {
@@ -19,16 +19,71 @@ interface Props {
   menuId: string
 }
 
+const STORAGE_PREFIX = 'ttukttak:checked:'
+// 마지막 담기 후 24시간이 지나면 지난 장보기로 보고 버린다.
+const EXPIRY_MS = 24 * 60 * 60 * 1000
+
+// 저장은 effect가 아니라 사용자 액션에서 한다 — 마운트 시 빈 상태가 저장본을 덮어쓰는 경쟁을 원천 차단.
+// (컴포넌트 밖에 둬 렌더 순수성 규칙과 무관하게 Date.now()를 쓴다.)
+function persist(key: string, next: Set<number>) {
+  try {
+    if (next.size === 0) localStorage.removeItem(key)
+    else localStorage.setItem(key, JSON.stringify({ ids: [...next], savedAt: Date.now() }))
+  } catch {
+    // 저장 실패(용량 초과·시크릿 모드)해도 화면 동작은 유지한다.
+  }
+}
+
 export default function IngredientsChecklist({ ingredients, people, menuId }: Props) {
   const [checked, setChecked] = useState<Set<number>>(new Set())
   const [copied, setCopied] = useState(false)
 
-  const toggle = (id: number) =>
-    setChecked(prev => {
-      const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
-      return next
-    })
+  const storageKey = `${STORAGE_PREFIX}${menuId}`
+  // 재료 ID 목록을 원시값으로 고정해, 부모 리렌더로 배열 참조만 바뀔 때 로드 effect가 재실행되지 않게 한다.
+  const ingredientIdsKey = ingredients.map(item => item.ingredientId).join(',')
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(storageKey)
+      if (!raw) return
+      const { ids, savedAt } = JSON.parse(raw) as { ids: number[]; savedAt: number }
+      if (!Array.isArray(ids) || Date.now() - savedAt > EXPIRY_MS) {
+        localStorage.removeItem(storageKey)
+        return
+      }
+      // 메뉴 재료가 바뀌었을 수 있으니 현재 목록에 있는 ID만 살린다(진행률이 깨지지 않게).
+      const valid = new Set(ingredientIdsKey.split(',').map(Number))
+      const restored = ids.filter(id => valid.has(id))
+      // localStorage는 브라우저 전용이라 마운트 후 effect에서 로드해야 SSR 하이드레이션 미스매치가 없다.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      if (restored.length) setChecked(new Set(restored))
+    } catch {
+      // 저장본이 손상됐으면 빈 상태로 시작한다.
+    }
+  }, [storageKey, ingredientIdsKey])
+
+  const toggle = (id: number) => {
+    const next = new Set(checked)
+    if (next.has(id)) next.delete(id)
+    else next.add(id)
+    setChecked(next)
+    persist(storageKey, next)
+  }
+
+  const reset = () => {
+    setChecked(new Set())
+    persist(storageKey, new Set())
+  }
+
+  const total = ingredients.length
+  const done = checked.size
+  const percent = total ? Math.round((done / total) * 100) : 0
+  const isComplete = total > 0 && done === total
+
+  // 남은(미체크) 재료를 위로, 담은 재료를 아래로. 각 그룹 내부 순서는 유지되는 안정 정렬.
+  const ordered = [...ingredients].sort(
+    (a, b) => Number(checked.has(a.ingredientId)) - Number(checked.has(b.ingredientId))
+  )
 
   const listText = ingredients
     .map(item => `${item.name} ${item.requiredAmount}${item.unit}`)
@@ -82,10 +137,54 @@ return (
           </svg>
           목록 공유
         </button>
+        {done > 0 && (
+          <button
+            onClick={reset}
+            className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-rose-500 transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            초기화
+          </button>
+        )}
       </div>
 
+      {total > 0 && (
+        <div className="mb-4">
+          <div className="flex items-center justify-between mb-2">
+            <span className={`text-sm font-semibold ${isComplete ? 'text-rose-500' : 'text-gray-800'}`}>
+              {isComplete ? '장보기 완료!' : `${done}/${total} 담음`}
+            </span>
+            <span className="text-sm font-medium text-gray-400">{percent}%</span>
+          </div>
+          <div
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={percent}
+            aria-label="장보기 진행률"
+            className="h-2 w-full rounded-full bg-gray-100 overflow-hidden"
+          >
+            <div
+              className="h-full rounded-full bg-rose-500 transition-all duration-300 ease-out"
+              style={{ width: `${percent}%` }}
+            />
+          </div>
+        </div>
+      )}
+
+      {isComplete && (
+        <div className="mb-4 flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3">
+          <span className="text-xl">🎉</span>
+          <span className="text-sm font-semibold text-rose-500">
+            재료를 다 담았어요! 이제 요리를 시작해볼까요?
+          </span>
+        </div>
+      )}
+
       <ul className="flex flex-col gap-3 mb-4">
-        {ingredients.map(item => {
+        {ordered.map(item => {
           const isChecked = checked.has(item.ingredientId)
           return (
             <li
@@ -144,7 +243,9 @@ return (
 
       <Link
         href={`/recipe?people=${people}&menuId=${menuId}`}
-        className="block w-full py-3 rounded-xl text-center font-semibold text-white bg-rose-500 hover:bg-rose-600 transition-colors"
+        className={`block w-full py-3 rounded-xl text-center font-semibold text-white bg-rose-500 hover:bg-rose-600 transition-all ${
+          isComplete ? 'scale-[1.02] ring-2 ring-rose-300 ring-offset-2' : ''
+        }`}
       >
         레시피 보기
       </Link>
